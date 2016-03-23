@@ -12,10 +12,46 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    var newsItems = [NewsItem]()
 
-
+    class func newsItemsChangedNotification() -> String {
+    
+        return "\(__FUNCTION__)"
+        
+    }
+    
+    func fetchNewsItems() -> Bool {
+        
+        if(arc4random_uniform(2) != 1) {
+            
+            return false
+            
+        }
+        
+        let item = NewsItem(date: NSDate(), text: "News Item \(newsItems.count + 1)")
+        newsItems.append(item)
+        NSNotificationCenter.defaultCenter().postNotificationName(self.classForCoder.newsItemsChangedNotification(), object: nil)
+        return true
+        
+    }
+    
+    func application(application: UIApplication, performFetchWithCompletionHandler completionHandler: (UIBackgroundFetchResult) -> Void) {
+        
+        if self.fetchNewsItems() {
+            
+            completionHandler(UIBackgroundFetchResult.NewData)
+            
+        } else {
+            
+            completionHandler(UIBackgroundFetchResult.NoData)
+            
+        }
+        
+    }
+    
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        // Override point for customization after application launch.
+        newsItems.append(NewsItem(date: NSDate(), text: "News Item 1"))
+        application.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
         return true
     }
 
@@ -42,5 +78,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
 
+}
+
+struct NewsItem {
+    
+    var date: NSDate
+    var text: String
+    
 }
 
